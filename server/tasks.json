@@ -1,0 +1,69 @@
+[
+  {
+    "id": "water-500",
+    "title": "Drink 500 ml water",
+    "category": "hydration",
+    "impact_weight": 4,
+    "effort_min": 5,
+    "micro_alt": "water-250",
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "water-250",
+    "title": "Drink 250 ml water",
+    "category": "hydration",
+    "impact_weight": 3,
+    "effort_min": 3,
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "steps-1k",
+    "title": "Walk 1,000 steps",
+
+    "category": "movement",
+    "impact_weight": 4,
+    "effort_min": 10,
+    "micro_alt": "steps-300",
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "steps-300",
+    "title": "Walk 300 steps (indoors ok)",
+    "category": "movement",
+    "impact_weight": 3,
+    "effort_min": 5,
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "screen-break-10",
+    "title": "Take a 10-min screen break",
+    "category": "screen",
+    "impact_weight": 4,
+    "effort_min": 10,
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "sleep-winddown-15",
+    "title": "15-min wind-down routine",
+    "category": "sleep",
+    "impact_weight": 5,
+    "effort_min": 15,
+    "time_gate": "evening",
+    "ignores": 0,
+    "completedToday": false
+  },
+  {
+    "id": "mood-check-quick",
+    "title": "Quick mood check-in",
+    "category": "mood",
+    "impact_weight": 2,
+    "effort_min": 3,
+    "ignores": 0,
+    "completedToday": false
+  }
+]

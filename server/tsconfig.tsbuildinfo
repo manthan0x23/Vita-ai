@@ -1,0 +1,10 @@
+{
+  "root": [
+    "./src/index.ts",
+    "./src/controllers/authentication/login-google.ts",
+    "./src/routes/root.ts",
+    "./src/routes/authentication/routes.ts",
+    "./src/utils/env.ts"
+  ],
+  "version": "5.8.3"
+}
