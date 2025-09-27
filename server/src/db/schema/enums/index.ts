@@ -12,6 +12,7 @@ export const tasksTimeGateEnum = pgEnum("tasks_time_gate_enum", [
   "morning",
   "evening",
   "afternoon",
+  "anytime",
 ]);
 
 export const unitEnum = pgEnum("unit_enum", [
@@ -26,4 +27,5 @@ export const taskActionEnum = pgEnum("task_action_enum", [
   "pending",
   "dismiss",
   "complete",
+  "ignore",
 ]);

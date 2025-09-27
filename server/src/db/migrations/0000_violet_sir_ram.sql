@@ -1,6 +1,6 @@
-CREATE TYPE "public"."task_action_enum" AS ENUM('pending', 'dismiss', 'complete');--> statement-breakpoint
+CREATE TYPE "public"."task_action_enum" AS ENUM('pending', 'dismiss', 'complete', 'ignore');--> statement-breakpoint
 CREATE TYPE "public"."tasks_category_enum" AS ENUM('hydration', 'movement', 'sleep', 'screen', 'mood');--> statement-breakpoint
-CREATE TYPE "public"."tasks_time_gate_enum" AS ENUM('morning', 'evening', 'afternoon');--> statement-breakpoint
+CREATE TYPE "public"."tasks_time_gate_enum" AS ENUM('morning', 'evening', 'afternoon', 'anytime');--> statement-breakpoint
 CREATE TYPE "public"."unit_enum" AS ENUM('ml', 'steps', 'hours', 'minutes', 'mood');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" varchar PRIMARY KEY NOT NULL,
@@ -17,14 +17,17 @@ CREATE TABLE "tasks" (
 	"category" "tasks_category_enum" NOT NULL,
 	"impact_weight" integer NOT NULL,
 	"effort_min" integer NOT NULL,
-	"time_gate" "tasks_time_gate_enum" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	"parent_id" varchar(256),
+	"timegate" "tasks_time_gate_enum" DEFAULT 'anytime' NOT NULL,
+	"reward" integer,
+	"is_main" boolean DEFAULT true,
+	"alternative_task" varchar,
+	"micro_task" varchar,
 	CONSTRAINT "tasks_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
 CREATE TABLE "system_state" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" varchar(256) PRIMARY KEY NOT NULL,
 	"last_refresh" timestamp NOT NULL
 );
 --> statement-breakpoint
@@ -42,7 +45,8 @@ CREATE TABLE "user_goals" (
 	"goal_type" "tasks_category_enum" NOT NULL,
 	"target_value" integer NOT NULL,
 	"unit" "unit_enum" NOT NULL,
-	"created_at" timestamp DEFAULT now()
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "goal_user_idx_composite_unique_key" UNIQUE("user_id","goal_type")
 );
 --> statement-breakpoint
 CREATE TABLE "user_metrics" (
@@ -59,8 +63,10 @@ CREATE TABLE "user_tasks" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" varchar NOT NULL,
 	"task_id" varchar(256) NOT NULL,
-	"ignores" integer DEFAULT 0,
+	"ignores" integer DEFAULT 0 NOT NULL,
 	"status" "task_action_enum" DEFAULT 'pending' NOT NULL,
+	"last_dismissal" timestamp,
+	"last_completion" timestamp,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint

@@ -1,5 +1,5 @@
 {
-  "id": "204bdb8d-b723-4400-af83-2e9f84b9255f",
+  "id": "4bbb7607-d7cb-4767-b9eb-734e158524a3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -92,13 +92,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "time_gate": {
-          "name": "time_gate",
-          "type": "tasks_time_gate_enum",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -106,9 +99,36 @@
           "notNull": false,
           "default": "now()"
         },
-        "parent_id": {
-          "name": "parent_id",
-          "type": "varchar(256)",
+        "timegate": {
+          "name": "timegate",
+          "type": "tasks_time_gate_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'anytime'"
+        },
+        "reward": {
+          "name": "reward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_main": {
+          "name": "is_main",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "alternative_task": {
+          "name": "alternative_task",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "micro_task": {
+          "name": "micro_task",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         }
@@ -135,7 +155,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar(256)",
           "primaryKey": true,
           "notNull": true
         },
@@ -287,7 +307,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "goal_user_idx_composite_unique_key": {
+          "name": "goal_user_idx_composite_unique_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "goal_type"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -389,7 +418,7 @@
           "name": "ignores",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 0
         },
         "status": {
@@ -399,6 +428,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
+        },
+        "last_dismissal": {
+          "name": "last_dismissal",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_completion": {
+          "name": "last_completion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -451,7 +492,8 @@
       "values": [
         "pending",
         "dismiss",
-        "complete"
+        "complete",
+        "ignore"
       ]
     },
     "public.tasks_category_enum": {
@@ -471,7 +513,8 @@
       "values": [
         "morning",
         "evening",
-        "afternoon"
+        "afternoon",
+        "anytime"
       ]
     },
     "public.unit_enum": {

@@ -13,6 +13,7 @@ export const tasksTimeGateEnumSchema = z.enum([
   "morning",
   "evening",
   "afternoon",
+  "anytime",
 ]);
 export type TasksTimeGateEnum = z.infer<typeof tasksTimeGateEnumSchema>;
 
@@ -27,3 +28,29 @@ export type UnitEnum = z.infer<typeof unitEnumSchema>;
 
 export const taskActionEnumSchema = z.enum(["pending", "dismiss", "complete"]);
 export type TaskActionEnum = z.infer<typeof taskActionEnumSchema>;
+
+export const categoryUnits: {
+  category: TasksCategoryEnum;
+  unit: UnitEnum;
+}[] = [
+  {
+    category: "hydration",
+    unit: "ml",
+  },
+  {
+    category: "movement",
+    unit: "steps",
+  },
+  {
+    category: "sleep",
+    unit: "hours",
+  },
+  {
+    category: "screen",
+    unit: "minutes",
+  },
+  {
+    category: "mood",
+    unit: "mood",
+  },
+];

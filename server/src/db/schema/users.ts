@@ -1,7 +1,5 @@
-import { varchar } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
+import { varchar, pgTable, timestamp } from "drizzle-orm/pg-core";
 import { NanoId } from "../../utils/func/nano-id";
-import { timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: varchar("id").unique().primaryKey().notNull().$defaultFn(NanoId),

@@ -12,7 +12,7 @@ const app = express();
 app
   .use(cors({ origin: "*", credentials: true }))
   .use(helmet())
-  .use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"))
+  .use(morgan(Env.NODE_ENV))
   .use(express.json())
   .use(cookieParser())
   .use("/api", ApiRouter)

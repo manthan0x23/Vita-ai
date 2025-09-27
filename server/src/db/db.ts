@@ -1,21 +1,17 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
+import * as schema from "./schema";
 import dotenv from "dotenv";
 import { Env } from "../config/env";
 
 dotenv.config();
 
-const migrationClient = postgres(Env.DATABASE_URL, {
-  max: 1,
+const dbClient = postgres(Env.DATABASE_URL as string, {
+  max: 100,
+  idle_timeout: 60,
+  max_lifetime: 60 * 15,
 });
 
-async function main() {
-  await migrate(drizzle(migrationClient), {
-    migrationsFolder: "./src/db/migrations",
-  });
+const db = drizzle(dbClient, { schema });
 
-  await migrationClient.end();
-}
-
-main();
+export { db };

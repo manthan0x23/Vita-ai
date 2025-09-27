@@ -1,4 +1,4 @@
-import { varchar } from "drizzle-orm/pg-core";
+import { boolean, varchar } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 import { NanoId } from "../../utils/func/nano-id";
 import { tasksCategoryEnum, tasksTimeGateEnum } from "./enums";
@@ -14,10 +14,13 @@ export const tasks = pgTable("tasks", {
   impactWeight: integer("impact_weight").notNull(),
   effortMin: integer("effort_min").notNull(),
 
-  timeGate: tasksTimeGateEnum("time_gate").notNull(),
-
   createdAt: timestamp("created_at").defaultNow(),
+  timegate: tasksTimeGateEnum("timegate").notNull().default("anytime"),
 
-  //   self reference - null
-  parentId: varchar("parent_id", { length: 256 }),
+  reward: integer("reward"),
+
+  isMain: boolean("is_main").default(true),
+
+  alternativeTask: varchar("alternative_task"),
+  microTask: varchar("micro_task"),
 });
