@@ -16,6 +16,7 @@ import {
 import { eq } from "drizzle-orm";
 import { categoryUnits } from "../../utils/dtos/enums";
 import { Env } from "../../config/env";
+import { userSuperGoals } from "../../db/schema/user_supergoals";
 
 type HandlerResponse = {
   message: string;
@@ -51,6 +52,11 @@ export const loginUserHandler = async (
         await tx.insert(systemState).values({
           id: user1.id,
           lastRefresh: new Date(),
+        });
+
+        await tx.insert(userSuperGoals).values({
+          userId: user1.id,
+          createdAt: new Date(),
         });
 
         await Promise.all(

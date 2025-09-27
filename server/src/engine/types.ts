@@ -1,7 +1,4 @@
-import type {
-  TasksCategoryEnum,
-  TasksTimeGateEnum,
-} from "../utils/dtos/enums";
+import type { TasksCategoryEnum, TasksTimeGateEnum } from "../utils/dtos/enums";
 
 export interface Task {
   id: string;
@@ -19,6 +16,22 @@ export interface Metrics {
   screenTimeMin: number;
   mood1to5?: number | null;
 }
+
+export interface SuperGoals {
+  hydration: number;
+  mood: number;
+  sleep: number;
+  movement: number;
+  screen: number;
+}
+
+export const DefaultSuperGoals: SuperGoals = {
+  hydration: 2400,
+  mood: 0,
+  sleep: 8,
+  movement: 8000,
+  screen: 120,
+};
 
 export interface TodayState {
   ignores: number;

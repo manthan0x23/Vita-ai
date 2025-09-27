@@ -1,5 +1,5 @@
 import type { TasksTimeGateEnum } from "../utils/dtos/enums";
-import { Metrics, Task, TodayState } from "./types";
+import { Metrics, SuperGoals, Task, TodayState } from "./types";
 
 export class ScoringEngine {
   private static W = {
@@ -30,27 +30,27 @@ export class ScoringEngine {
     return inWindow ? 1 : 0.2;
   }
 
-  private static urgency(task: Task, m: Metrics): number {
+  private static urgency(task: Task, m: Metrics, s: SuperGoals): number {
     switch (task.category) {
       case "hydration": {
-        const goal = 2400;
+        const goal = s.hydration;
         return m.waterMl < goal ? (goal - m.waterMl) / goal : 0;
       }
       case "movement": {
-        const goal = 8000;
+        const goal = s.movement;
         return m.steps < goal ? (goal - m.steps) / goal : 0;
       }
       case "sleep": {
-        const goal = 7;
+        const goal = s.sleep;
         return m.sleepHours < goal ? 1 : 0;
       }
       case "screen": {
-        const limit = 120;
+        const limit = s.screen;
         return m.screenTimeMin > limit ? 1 : 0;
       }
       case "mood": {
         const v = m.mood1to5 ?? 3;
-        return v <= 2 ? 1 : 0.3;
+        return v <= 2 ? 1 : 0.2;
       }
       default:
         return 0;
@@ -73,9 +73,10 @@ export class ScoringEngine {
     task: Task,
     state: TodayState,
     m: Metrics,
+    superGoals: SuperGoals,
     now: Date
   ) {
-    const U = this.urgency(task, m);
+    const U = this.urgency(task, m, superGoals);
     const invEff = this.inverseEffort(task.effortMin);
     const tod = this.timeOfDayFactor(now, task.timeGate);
     const rec = this.recencyPenalty(state.lastCompletion, now);

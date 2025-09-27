@@ -1,8 +1,16 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "../db/db";
 import { tasks, userTasks, userGoals } from "../db/schema";
-import { Metrics, ScoredTask, Task, TodayState } from "./types";
+import {
+  DefaultSuperGoals,
+  Metrics,
+  ScoredTask,
+  SuperGoals,
+  Task,
+  TodayState,
+} from "./types";
 import { ScoringEngine } from "./scoring";
+import { userSuperGoals } from "../db/schema/user_supergoals";
 
 type TaskRow = typeof tasks.$inferSelect;
 type UserTaskRow = typeof userTasks.$inferSelect;
@@ -105,6 +113,12 @@ export class RecommendationEngine {
         user_tasks: UserTaskRow;
         tasks: TaskRow;
       }>;
+
+      const [uSuperGoals] = await tx
+        .select()
+        .from(userSuperGoals)
+        .where(eq(userSuperGoals.userId, userId))
+        .orderBy(desc(userSuperGoals.createdAt));
 
       const mainRows = utRows.filter((r) => r.tasks.isMain);
 
@@ -219,10 +233,21 @@ export class RecommendationEngine {
             lastCompletion: ut?.lastCompletion ?? null,
           };
 
+          const superGoals: SuperGoals = {
+            hydration:
+              Number(userSuperGoals.hydration) ?? DefaultSuperGoals.hydration,
+            sleep: Number(userSuperGoals.sleep) ?? DefaultSuperGoals.sleep,
+            screen: Number(userSuperGoals.screen) ?? DefaultSuperGoals.screen,
+            mood: Number(userSuperGoals.mood) ?? DefaultSuperGoals.mood,
+            movement:
+              Number(userSuperGoals.movement) ?? DefaultSuperGoals.movement,
+          };
+
           const score = ScoringEngine.computeScore(
             task,
             todayState,
             userMetrics,
+            superGoals,
             now
           );
 
