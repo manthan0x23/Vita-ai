@@ -50,7 +50,7 @@ pnpm db:seed
 ```
 Option B:
 ```
-pnpm /api/admin/seed
+GET /api/admin/seed
 ```
 
 ### 6. Build ,Start and Test
