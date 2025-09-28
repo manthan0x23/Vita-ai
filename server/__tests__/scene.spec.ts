@@ -95,6 +95,8 @@ describe("Hydration Task Recommendation", () => {
     const secondResponse = await agent.get("/api/task/recommend").expect(201);
     const secondTasks: Task[] = secondResponse.body.tasks;
 
-    expect(secondTasks.find((t) => t.id === "hydration-0.5l")).toBeUndefined();
+    expect(
+      secondTasks.find((t) => t.base.category === "hydration")
+    ).toBeUndefined();
   });
 });
