@@ -47,6 +47,24 @@ Required environment variables:
 - `PORT` - API server port (default: 5001)
 - `NODE_ENV` - Environment mode (development/production)
 
+> **⚠️ Important: Test Environment Setup**
+>
+> For running tests, you'll need to create a `.env.test` file with the following configuration:
+>
+> ```bash
+> # Create test environment file
+> cp .env.example .env.test
+> ```
+>
+> **Add these values to `.env.test`:**
+> ```env
+> DATABASE_URL=postgres://root:password@localhost:5438/vita_ai_test
+> NODE_ENV=test
+> PORT=5001
+> ```
+>
+> **Note:** If you're using `pnpm db:up`, the test database is created automatically with these default settings - no changes needed in `.env.test`.
+
 ### 2. Install Dependencies
 
 ```bash
@@ -111,7 +129,6 @@ curl http://localhost:5001/api/admin/seed
 
 ### 6. Build and Start the Application
 
-
 #### Build
 ```bash
 # Build TypeScript to JavaScript
@@ -158,8 +175,6 @@ pnpm test
 | `pnpm db:migrate` | Run database migrations |
 | `pnpm db:seed` | Seed database with sample data |
 
-
-
 ### Database Management
 
 #### Reset Database
@@ -172,12 +187,23 @@ pnpm db:migrate
 
 ---
 
+## Environment Files Summary
+
+Your project should have these environment files:
+
+- **`.env`** - Main development environment
+- **`.env.test`** - Test environment (required for running tests)
+- **`.env.example`** - Template file (committed to git)
+
+Make sure to add both `.env` and `.env.test` to your `.gitignore` file to avoid committing sensitive data.
+
+---
+
 ## Next Steps
 
 After successful setup:
 
 1. **Explore the API** - Review [routes.md](./Routes.md) for endpoint documentation
 2. **Test endpoints** - Use Postman, curl, or your preferred API client
-
 
 Happy coding! 🚀
