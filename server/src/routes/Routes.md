@@ -14,9 +14,10 @@ This API provides endpoints for user authentication, profile management, task re
 | PUT | [/user/super-goals](#2-update-super-goals) | Update user's super goals | ✅ |
 | GET | [/user/get](#3-get-user-profile) | Get user profile | ✅ |
 | GET | [/user/metrics](#4-get-user-metrics) | Get user metrics/statistics | ✅ |
-| GET | [/task/recommend](#5-get-task-recommendations) | Get task recommendations | ✅ |
-| PUT | [/task/update-status](#6-update-task-status) | Update task status | ✅ |
-| GET | [/admin/seed](#7-seed-tasks-admin) | Seed tasks for testing | ❌ |
+| GET | [/user/metrics/today](#5-get-todays-metrics) | Get today's metrics and task history rates | ✅ |
+| GET | [/task/recommend](#6-get-task-recommendations) | Get task recommendations | ✅ |
+| PUT | [/task/update-status](#7-update-task-status) | Update task status | ✅ |
+| GET | [/admin/seed](#8-seed-tasks-admin) | Seed tasks for testing | ❌ |
 
 ## Authentication
 
@@ -193,72 +194,46 @@ GET /user/metrics?page=1&perPage=5
   "message": "User metrics fetched successfully",
   "data": [
     {
-      "date": "2025-09-28T00:00:00.000Z",
-      "progress": 67,
-      "goals": [
-        {
-          "type": "hydration",
-          "progress": "75%",
-          "consumption": 1800
-        },
-        {
-          "type": "movement",
-          "progress": "65%",
-          "consumption": 5200
-        },
-        {
-          "type": "sleep",
-          "progress": "88%",
-          "consumption": 7
-        },
-        {
-          "type": "screen",
-          "progress": "50%",
-          "consumption": 60
-        },
-        {
-          "type": "mood",
-          "progress": "80%",
-          "consumption": 4
-        }
-      ]
-    },
-    {
       "date": "2025-09-27T00:00:00.000Z",
-      "progress": 72,
+      "progress": 63,
       "goals": [
         {
           "type": "hydration",
-          "progress": "90%",
-          "consumption": 2160
-        },
-        {
-          "type": "movement",
-          "progress": "80%",
-          "consumption": 6400
-        },
-        {
-          "type": "sleep",
-          "progress": "75%",
-          "consumption": 6
-        },
-        {
-          "type": "screen",
-          "progress": "33%",
-          "consumption": 40
+          "progress": "83%",
+          "consumption": 2000
         },
         {
           "type": "mood",
-          "progress": "100%",
+          "progress": "0%",
           "consumption": 5
+        },
+        {
+          "type": "movement",
+          "progress": "31%",
+          "consumption": 2500
+        },
+        {
+          "type": "screen",
+          "progress": "100%",
+          "consumption": 160
+        },
+        {
+          "type": "sleep",
+          "progress": "100%",
+          "consumption": 8
         }
-      ]
+      ],
+      "taskStats": {
+        "dismissalRate": 0,
+        "completionRate": 0,
+        "ignoreRate": 0
+      }
     }
   ],
-  "totalEntries": 2,
-  "totalPages": 10,
+  "totalEntries": 1,
+  "totalPages": 5,
   "page": 1,
-  "perPage": 5
+  "perPage": 3
 }
 ```
 
@@ -274,6 +249,10 @@ GET /user/metrics?page=1&perPage=5
 | data[].goals[].type | string | Goal type (hydration, movement, sleep, screen, mood) |
 | data[].goals[].progress | string | Progress percentage with % symbol |
 | data[].goals[].consumption | number | Actual consumption/achievement for that goal |
+| data[].taskStats | object | Task interaction statistics for that date |
+| data[].taskStats.dismissalRate | integer | Percentage of tasks dismissed (0-100) |
+| data[].taskStats.completionRate | integer | Percentage of tasks completed (0-100) |
+| data[].taskStats.ignoreRate | integer | Percentage of tasks ignored (0-100) |
 | totalEntries | integer | Number of entries returned in current page |
 | totalPages | integer | Total number of pages available |
 | page | integer | Current page number |
@@ -291,7 +270,96 @@ GET /user/metrics?page=1&perPage=5
 
 ---
 
-### 5. Get Task Recommendations
+### 5. Get Today's Metrics
+
+**GET** `/user/metrics/today`
+
+🔒 **Authentication Required**
+
+Retrieve today's metrics and task history rates for the authenticated user.
+
+#### Example Request
+
+```
+GET /user/metrics/today
+```
+
+#### Response
+
+**Success (200)**
+```json
+{
+  "message": "Today's user metrics and task history rates fetched successfully",
+  "date": "2025-09-28",
+  "goals": [
+    {
+      "goalType": "hydration",
+      "consumption": 500000,
+      "target": 2400000,
+      "progress": 21
+    },
+    {
+      "goalType": "movement",
+      "consumption": 2000,
+      "target": 8000,
+      "progress": 25
+    },
+    {
+      "goalType": "sleep",
+      "consumption": 0,
+      "target": 8,
+      "progress": 0
+    },
+    {
+      "goalType": "screen",
+      "consumption": 0,
+      "target": 120,
+      "progress": 0
+    },
+    {
+      "goalType": "mood",
+      "consumption": 2,
+      "target": 0,
+      "progress": 0
+    }
+  ],
+  "taskHistoryRates": {
+    "dismissalRate": 0,
+    "completionRate": 50,
+    "ignoreRate": 50
+  }
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| message | string | Success message |
+| date | string | Today's date in YYYY-MM-DD format |
+| goals | array | Array of today's goal progress |
+| goals[].goalType | string | Goal type (hydration, movement, sleep, screen, mood) |
+| goals[].consumption | number | Actual consumption/achievement today |
+| goals[].target | number | Target goal value |
+| goals[].progress | integer | Progress percentage (0-100) |
+| taskHistoryRates | object | Task interaction rates |
+| taskHistoryRates.dismissalRate | integer | Percentage of tasks dismissed (0-100) |
+| taskHistoryRates.completionRate | integer | Percentage of tasks completed (0-100) |
+| taskHistoryRates.ignoreRate | integer | Percentage of tasks ignored (0-100) |
+
+#### Notes
+
+- Returns current day's progress across all goal types
+- Task history rates are calculated from user's historical task interactions
+- Progress is calculated as (consumption / target) * 100, capped at 100%
+- All rates in taskHistoryRates sum up to 100%
+
+**Error Responses**
+- `401` - Unauthorized - Missing or invalid cookie
+
+---
+
+### 6. Get Task Recommendations
 
 **GET** `/task/recommend`
 
@@ -392,7 +460,7 @@ GET /task/recommend
 
 ---
 
-### 6. Update Task Status
+### 7. Update Task Status
 
 **PUT** `/task/update-status`
 
@@ -433,7 +501,7 @@ Update the status of a specific task.
 
 ---
 
-### 7. Seed Tasks (Admin)
+### 8. Seed Tasks (Admin)
 
 **GET** `/admin/seed`
 

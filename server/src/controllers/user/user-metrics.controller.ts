@@ -8,18 +8,26 @@ import { userMetricsInput } from "./dtos/user-metrics.dto";
 import { db } from "../../db/db";
 import { userSuperGoals } from "../../db/schema/user_supergoals";
 import { userMetrics } from "../../db/schema/user_metrics";
-import { eq, desc, sql, gte, lte, and } from "drizzle-orm";
+import { taskHistory } from "../../db/schema/task_history";
+import { eq, desc, sql, gte, lte, and, count } from "drizzle-orm";
 
 interface GoalPerPage {
   type: string;
-  progress: string; // "80%"
-  consumption: number; // summed consumption for that date
+  progress: string;
+  consumption: number;
+}
+
+interface TaskHistoryStats {
+  dismissalRate: number;
+  completionRate: number;
+  ignoreRate: number;
 }
 
 interface Page {
   date: Date;
-  progress: number; // average percentage across all goals on that date
+  progress: number;
   goals: GoalPerPage[];
+  taskStats: TaskHistoryStats;
 }
 
 interface Result {
@@ -33,7 +41,6 @@ interface Result {
 
 function toISODateString(d: Date | string) {
   const dt = typeof d === "string" ? new Date(d) : d;
-  // returns YYYY-MM-DD (no time)
   return dt.toISOString().split("T")[0];
 }
 
@@ -63,6 +70,7 @@ export const userMetricsHandler = async (
     let totalPages = 0;
 
     await db.transaction(async (tx) => {
+      // fetch user super goals
       const [superGoals] = await tx
         .select()
         .from(userSuperGoals)
@@ -72,15 +80,18 @@ export const userMetricsHandler = async (
         throw new BadRequestError("User goals not found");
       }
 
+      // total entries (distinct dates)
       const totalDatesRow = await tx
         .select({
           cnt: sql<number>`COUNT(DISTINCT ${userMetrics.date})`.as("cnt"),
         })
         .from(userMetrics)
         .where(eq(userMetrics.userId, req.user!));
+
       const totalDates = (totalDatesRow && totalDatesRow[0]?.cnt) || 0;
       totalPages = Math.max(0, Math.ceil(totalDates / perPage));
 
+      // find distinct dates for this page
       const distinctDatesRows = await tx
         .selectDistinct({ date: userMetrics.date })
         .from(userMetrics)
@@ -100,6 +111,7 @@ export const userMetricsHandler = async (
       const maxDateStr = datesList[0];
       const minDateStr = datesList[datesList.length - 1];
 
+      // aggregate metrics per goal per date
       const aggregated = await tx
         .select({
           date: userMetrics.date,
@@ -120,7 +132,7 @@ export const userMetricsHandler = async (
       const grouped = new Map<string, GoalPerPage[]>();
       for (const row of aggregated) {
         const dateKey = toISODateString(row.date);
-        if (!datesList.includes(dateKey)) continue; // safety
+        if (!datesList.includes(dateKey)) continue;
 
         const target = (() => {
           switch (row.goalType) {
@@ -155,6 +167,57 @@ export const userMetricsHandler = async (
         grouped.get(dateKey)!.push(g);
       }
 
+      // --- fetch task history stats ---
+      const taskAgg = await tx
+        .select({
+          date: sql<string>`DATE(${taskHistory.createdAt})`.as("date"),
+          action: taskHistory.action,
+          cnt: count().as("cnt"),
+        })
+        .from(taskHistory)
+        .where(
+          and(
+            eq(taskHistory.userId, req.user!),
+            gte(taskHistory.createdAt, new Date(minDateStr)),
+            lte(taskHistory.createdAt, new Date(maxDateStr))
+          )
+        )
+        .groupBy(sql`DATE(${taskHistory.createdAt})`, taskHistory.action);
+
+      const taskGrouped = new Map<
+        string,
+        { dismissal: number; completion: number; ignore: number; total: number }
+      >();
+
+      for (const row of taskAgg) {
+        const dateKey = row.date;
+        if (!datesList.includes(dateKey)) continue;
+
+        if (!taskGrouped.has(dateKey)) {
+          taskGrouped.set(dateKey, {
+            dismissal: 0,
+            completion: 0,
+            ignore: 0,
+            total: 0,
+          });
+        }
+        const bucket = taskGrouped.get(dateKey)!;
+
+        switch (row.action) {
+          case "dismiss":
+            bucket.dismissal += Number(row.cnt);
+            break;
+          case "complete":
+            bucket.completion += Number(row.cnt);
+            break;
+          case "ignore":
+            bucket.ignore += Number(row.cnt);
+            break;
+        }
+        bucket.total += Number(row.cnt);
+      }
+
+      // build final pages
       for (const dateStr of datesList) {
         const goals = grouped.get(dateStr) ?? [];
 
@@ -165,13 +228,31 @@ export const userMetricsHandler = async (
         const avgProgress =
           goals.length > 0 ? Math.round(totalPct / goals.length) : 0;
 
+        const hist = taskGrouped.get(dateStr);
+        const taskStats: TaskHistoryStats = {
+          dismissalRate:
+            hist && hist.total > 0
+              ? Math.round((hist.dismissal / hist.total) * 100)
+              : 0,
+          completionRate:
+            hist && hist.total > 0
+              ? Math.round((hist.completion / hist.total) * 100)
+              : 0,
+          ignoreRate:
+            hist && hist.total > 0
+              ? Math.round((hist.ignore / hist.total) * 100)
+              : 0,
+        };
+
         pages.push({
           date: new Date(dateStr),
           progress: avgProgress,
           goals,
+          taskStats,
         });
       }
     });
+
     return res.status(200).json({
       message: "User metrics fetched successfully",
       data: pages,
