@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 export const loginUserInput = z.object({
-  name: z.string().nullable(),
+  name: z.string().nullable().optional(),
   email: z.email().min(1),
 });
 

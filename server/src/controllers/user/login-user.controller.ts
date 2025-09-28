@@ -46,6 +46,7 @@ export const loginUserHandler = async (
           .insert(users)
           .values({
             ...input.data,
+            name: input.data.name ?? input.data.email.split("@")[0],
           })
           .returning();
 
