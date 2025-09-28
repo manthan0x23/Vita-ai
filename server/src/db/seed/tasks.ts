@@ -187,5 +187,5 @@ export async function seed_global_tasks() {
   }
 
   console.log("🎉 Tasks Seeding complete!");
-  process.exit(0);
+  // process.exit(0);
 }
