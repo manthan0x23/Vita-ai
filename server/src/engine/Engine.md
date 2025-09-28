@@ -1,6 +1,6 @@
 # Recommendation & Scoring Engine
 
-📁 **Engine Implementation**: [View engine folder](../server/src/engine/)
+📁 **Engine Implementation**: [View engine folder](./recommendation.ts)
 
 ## Overview
 
