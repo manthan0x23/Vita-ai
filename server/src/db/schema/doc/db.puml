@@ -1,0 +1,103 @@
+@startuml
+hide circle
+hide methods
+skinparam classAttributeIconSize 0
+
+entity users {
+  * id : varchar [PK, unique]
+  --
+  name : varchar(256)
+  email : varchar(256) [unique]
+  created_at : timestamp
+}
+
+entity tasks {
+  * id : varchar(256) [PK, unique]
+  --
+  title : varchar
+  category : tasks_category_enum
+  impact_weight : integer
+  effort_min : integer
+  created_at : timestamp
+  timegate : tasks_time_gate_enum
+  reward : integer
+  is_main : boolean
+  alternative_task : varchar
+  micro_task : varchar
+}
+
+entity system_state {
+  * id : varchar(256) [PK]
+  --
+  last_refresh : timestamp
+}
+
+entity task_history {
+  * id : serial [PK]
+  --
+  user_id : varchar(50) [FK → users.id]
+  task_id : varchar(50) [FK → tasks.id]
+  action : task_action_enum
+  created_at : timestamp
+}
+
+entity user_goals {
+  * id : serial [PK]
+  --
+  user_id : varchar [FK → users.id]
+  goal_type : tasks_category_enum
+  target_value : integer
+  unit : unit_enum
+  created_at : timestamp
+  --
+  UNIQUE(user_id, goal_type)
+}
+
+entity user_metrics {
+  * id : serial [PK]
+  --
+  user_id : varchar [FK → users.id]
+  date : date
+  goal_type : varchar(50)
+  value : integer
+  unit : unit_enum
+  created_at : timestamp
+}
+
+entity user_tasks {
+  * id : serial [PK]
+  --
+  user_id : varchar [FK → users.id]
+  task_id : varchar(256) [FK → tasks.id]
+  ignores : integer
+  status : task_action_enum
+  last_dismissal : timestamp
+  last_completion : timestamp
+  created_at : timestamp
+}
+
+entity user_super_goals {
+  * id : varchar [PK]
+  --
+  user_id : varchar [FK → users.id, unique]
+  hydration : integer
+  movement : integer
+  sleep : integer
+  screen : integer
+  mood : integer
+  created_at : timestamp
+}
+
+' ========================
+' Relationships
+' ========================
+users ||--o{ task_history : "has"
+users ||--o{ user_goals : "sets"
+users ||--o{ user_metrics : "tracks"
+users ||--o{ user_tasks : "owns"
+users ||--|| user_super_goals : "defines"
+
+tasks ||--o{ task_history : "referenced in"
+tasks ||--o{ user_tasks : "assigned"
+
+@enduml

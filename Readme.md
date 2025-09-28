@@ -3,14 +3,16 @@
 A Node.js/TypeScript service that provides intelligent wellness task recommendations with deterministic scoring, anti-nag substitution algorithms, time-based task gating, and daily progress resets. The service exposes a minimal HTTP API that delivers precisely four personalized tasks in a consistent, reproducible order.
 
 ---
+# Quick Start Guide
 
-## Quick Start
+## 📚 Documentation Overview
 
-### Setup
-For detailed local setup instructions, follow the [setup guide](./Setup.md).
-
-### API Documentation
-For comprehensive API documentation including all endpoints, request/response formats, and examples, see the [routes documentation](./Routes.md).
+| Component | Description | Link |
+|-----------|-------------|------|
+| 🚀 **Setup** | Local development environment setup and installation instructions | [Setup Guide](./Setup.md) |
+| 🌐 **API Routes** | Complete API documentation with endpoints, request/response formats, and examples | [Routes Documentation](./server/src/routes/Routes.md) |
+| 🗄️ **Database Schemas** | Database structure, relationships, and schema implementation guide | [Schemas Guide](./server/src/db/schema/doc/Schemas.md) |
+| ⚙️ **Recommendation Engine** | Task scoring algorithm, recommendation logic, and deterministic rotation system | [Engine Guide](./server/src/engine/Engine.md) |
 
 ---
 
@@ -46,15 +48,3 @@ Ensures consistent user experience by:
 - Providing predictable recommendation patterns
 
 ---
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
