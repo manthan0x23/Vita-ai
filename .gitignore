@@ -62,3 +62,6 @@ coverage/
 target/
 
 .tanstack
+
+
+postgres-data
