@@ -5,5 +5,5 @@ export const updateSuperGoals = z.object({
   movement: z.number().nullable().optional(),
   sleep: z.number().nullable().optional(),
   screen: z.number().nullable().optional(),
-  mood: z.number().nullable().optional(),
+  mood: z.number().min(1).max(5).nullable().optional(),
 });

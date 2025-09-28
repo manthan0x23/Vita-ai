@@ -1,64 +1,60 @@
 # Vita AI Smart Task Manager (Backend)
 
-A Node.js/TypeScript service that computes deterministic wellness task recommendations with anti-nag substitutions, time-of-day gating, and daily resets. Exposes a minimal HTTP API returning exactly four tasks in a reproducible order.
+A Node.js/TypeScript service that provides intelligent wellness task recommendations with deterministic scoring, anti-nag substitution algorithms, time-based task gating, and daily progress resets. The service exposes a minimal HTTP API that delivers precisely four personalized tasks in a consistent, reproducible order.
 
 ---
 
-## Prerequisites
+## Quick Start
 
-- Node.js ≥ 18  
-- pnpm ≥ 9  
-- Docker (optional, for Postgres)
+### Setup
+For detailed local setup instructions, follow the [setup guide](./Setup.md).
+
+### API Documentation
+For comprehensive API documentation including all endpoints, request/response formats, and examples, see the [routes documentation](./Routes.md).
 
 ---
 
-## Setup
+## Architecture
 
-### 1. Clone Repository  and Configure Environment
-```bash
-git clone https://github.com/manthan0x23/Vita-ai.git
-cd Vita-ai
-cp .env.example .env
-```
+The service is built with:
+- **Express.js** for HTTP routing
+- **TypeScript** for type safety
+- **Drizzle ORM** for database operations
+- **Zod** for request validation
+- **Cookie-based authentication** for simplicity
 
-### 2. Install Dependencies
-```
-pnpm install
-```
+## Key Concepts
 
-### 3. Database (Optional)
-Provide a Postgres connection string in .env or run a local Postgres container.
+### Task Scoring Algorithm
+Tasks are scored based on:
+- User's current progress toward goals
+- Task impact weight (1-5 scale)
+- Required effort and time investment
+- Historical completion patterns
+- Time-of-day appropriateness
 
-To start local Postgres:
-```
-pnpm db:up
-```
-Stop and remove:
-```
-pnpm db:down
-```
+### Anti-Nag System
+Prevents user fatigue by:
+- Rotating similar tasks across different time periods
+- Avoiding repetitive suggestions within the same session
+- Balancing high-impact tasks with achievable quick wins
 
-### 4. Run Migrations
-```
-pnpm db:migrate
-```
+### Deterministic Ordering
+Ensures consistent user experience by:
+- Using reproducible scoring algorithms
+- Maintaining stable task ordering across sessions
+- Providing predictable recommendation patterns
 
-### 5. Seed Data
-Option A:
-```
-pnpm db:seed
-```
-Option B:
-```
-GET /api/admin/seed
-```
+---
 
-### 6. Build ,Start and Test
-```
-pnpm build 
-```
-Then
-```
-pnpm start
-pnpm test
-```
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
