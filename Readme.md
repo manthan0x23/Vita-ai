@@ -3,7 +3,6 @@
 A Node.js/TypeScript service that provides intelligent wellness task recommendations with deterministic scoring, anti-nag substitution algorithms, time-based task gating, and daily progress resets. The service exposes a minimal HTTP API that delivers precisely four personalized tasks in a consistent, reproducible order.
 
 ---
-# Quick Start Guide
 
 ## 📚 Documentation Overview
 
@@ -25,26 +24,59 @@ The service is built with:
 - **Zod** for request validation
 - **Cookie-based authentication** for simplicity
 
-## Key Concepts
+---
 
-### Task Scoring Algorithm
-Tasks are scored based on:
-- User's current progress toward goals
-- Task impact weight (1-5 scale)
-- Required effort and time investment
+## 🎯 Core Features
+
+### Task Categories & Urgency Functions
+
+The system supports **5 core wellness categories**, each with its own urgency calculation function:
+
+| Category | Description | Urgency Function |
+|----------|-------------|------------------|
+| **💧 Hydration** | Daily water intake goals | Based on current consumption vs. target (ml) |
+| **🚶 Movement** | Physical activity tracking | Step count progress vs. daily goal |
+| **😴 Sleep** | Sleep quality and duration | Hours slept vs. target sleep duration |
+| **📱 Screen** | Digital wellness and screen time | Minutes of screen time vs. daily limit |
+| **😊 Mood** | Emotional wellness tracking | Mood rating progress (1-5 scale) |
+
+Each category has specialized urgency calculations that consider:
+- Current progress vs. targets
+- Time of day relevance
 - Historical completion patterns
-- Time-of-day appropriateness
+- Impact weight of available tasks
 
-### Anti-Nag System
-Prevents user fatigue by:
-- Rotating similar tasks across different time periods
-- Avoiding repetitive suggestions within the same session
-- Balancing high-impact tasks with achievable quick wins
+### Daily Reset System
 
-### Deterministic Ordering
-Ensures consistent user experience by:
-- Using reproducible scoring algorithms
-- Maintaining stable task ordering across sessions
-- Providing predictable recommendation patterns
+The service implements a **sophisticated daily reset mechanism** using the `system_state` table:
+
+#### Reset Triggers
+Daily state resets are automatically triggered on the **first API call** after midnight for each user via:
+- `/api/task/recommend` - Task recommendation requests
+- `/api/user/metrics` - Historical metrics queries  
+- `/api/user/metrics/today` - Today's progress requests
+
+#### Reset Process
+1. **Midnight Detection**: System checks if the last user activity was before current day
+2. **State Refresh**: User's `system_state` record is reset/refreshed
+3. **Task Pool Reset**: Dismissed and ignored tasks are re-evaluated
+4. **Progress Reset**: Daily progress counters are zeroed
+5. **Recommendation Recalculation**: Fresh task scoring and selection
+
+#### Benefits
+- **Automatic**: No cron jobs or scheduled tasks required
+- **User-Triggered**: Resets only when users are active
+- **Reliable**: Guaranteed fresh state on first daily interaction
+- **Efficient**: Minimal database operations per user per day
+
+### Intelligent Recommendation Engine
+
+The system features a sophisticated recommendation engine with:
+- **Anti-Nag Protection**: Intelligent task substitution and ignore-counting systems
+- **Deterministic Scoring**: Consistent, reproducible task recommendations
+- **Time-Based Gating**: Tasks recommended at optimal times of day
+- **Category Balancing**: Fair rotation across all wellness categories
+
+> 📖 **Detailed Documentation**: See [Engine Guide](./server/src/engine/Engine.md) for complete algorithm specifications, scoring functions, and anti-nag implementation details.
 
 ---

@@ -10,6 +10,7 @@ import { userSuperGoals } from "../../db/schema/user_supergoals";
 import { userGoals } from "../../db/schema";
 import { taskHistory } from "../../db/schema/task_history";
 import { eq, sql, and } from "drizzle-orm";
+import { resetUserTasks } from "../../engine/reset-tasks";
 
 function toISODateString(d: Date | string) {
   const dt = typeof d === "string" ? new Date(d) : d;
@@ -45,6 +46,7 @@ export const userMetricsTodayHandler = async (
   }
 
   try {
+    await resetUserTasks(req.user!);
     const todayStr = toISODateString(new Date());
 
     return await db.transaction(async (tx) => {
@@ -72,7 +74,7 @@ export const userMetricsTodayHandler = async (
         const target = (() => {
           switch (row.goalType) {
             case "hydration":
-              return superGoals.hydration ;
+              return superGoals.hydration;
             case "movement":
               return superGoals.movement;
             case "sleep":

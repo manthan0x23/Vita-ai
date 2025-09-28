@@ -10,6 +10,7 @@ import { userSuperGoals } from "../../db/schema/user_supergoals";
 import { userMetrics } from "../../db/schema/user_metrics";
 import { taskHistory } from "../../db/schema/task_history";
 import { eq, desc, sql, gte, lte, and, count } from "drizzle-orm";
+import { resetUserTasks } from "../../engine/reset-tasks";
 
 interface GoalPerPage {
   type: string;
@@ -64,6 +65,7 @@ export const userMetricsHandler = async (
   }
 
   try {
+    await resetUserTasks(req.user!);
     const offset = (page - 1) * perPage;
 
     const pages: Page[] = [];
