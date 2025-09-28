@@ -7,6 +7,7 @@ import {
 import { db } from "../../db/db";
 import { userGoals, users } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { userSuperGoals } from "../../db/schema/user_supergoals";
 
 export const getUserHandler = async (
   req: Request,
@@ -24,13 +25,18 @@ export const getUserHandler = async (
         .where(eq(users.id, req.user!))
         .limit(1);
 
+      const [userSuperGoal] = await tx
+        .selectDistinct()
+        .from(userSuperGoals)
+        .where(eq(userSuperGoals.userId, req.user!));
+
       const goals = (
         await tx.select().from(userGoals).where(eq(userGoals.userId, user.id))
       ).map((g) => ({
         type: g.goalType,
         progress: g.currentValue + " " + g.unit,
+        target: userSuperGoal[g.goalType],
       }));
-
       return { ...user, goals };
     });
 

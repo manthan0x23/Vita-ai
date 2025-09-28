@@ -6,7 +6,7 @@ dotenv.config();
 const envSchema = z.object({
     PORT: z.string().default("5000"),
     DATABASE_URL: z.string().min(1),
-    NODE_ENV: z.enum(["production", "development"]).default("development")
+    NODE_ENV: z.enum(["prod", "dev"]).default("dev")
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

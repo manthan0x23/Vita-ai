@@ -2,7 +2,7 @@ import type { TasksTimeGateEnum } from "../utils/dtos/enums";
 import { Metrics, SuperGoals, Task, TodayState } from "./types";
 
 export class ScoringEngine {
-  private static W = {
+  public static W = {
     urgency: 0.5,
     impact: 0.3,
     effort: 0.15,
@@ -11,12 +11,12 @@ export class ScoringEngine {
     recency: 0.25,
   };
 
-  private static inverseEffort(min: number): number {
+  public static inverseEffort(min: number): number {
     const m = Math.max(1, min);
     return 1 / Math.log2(m + 2);
   }
 
-  private static timeOfDayFactor(now: Date, gate?: TasksTimeGateEnum): number {
+  public static timeOfDayFactor(now: Date, gate?: TasksTimeGateEnum): number {
     if (!gate) return 1;
     const h = now.getHours();
     const isMorning = h >= 5 && h <= 11;
@@ -30,7 +30,7 @@ export class ScoringEngine {
     return inWindow ? 1 : 0.2;
   }
 
-  private static urgency(task: Task, m: Metrics, s: SuperGoals): number {
+  public static urgency(task: Task, m: Metrics, s: SuperGoals): number {
     switch (task.category) {
       case "hydration": {
         const goal = s.hydration;
@@ -57,10 +57,7 @@ export class ScoringEngine {
     }
   }
 
-  private static recencyPenalty(
-    lastCompletion: Date | null,
-    now: Date
-  ): number {
+  public static recencyPenalty(lastCompletion: Date | null, now: Date): number {
     if (!lastCompletion) return 0;
     const diffMinutes = (now.getTime() - lastCompletion.getTime()) / 60000;
     if (diffMinutes < 30) return 1;

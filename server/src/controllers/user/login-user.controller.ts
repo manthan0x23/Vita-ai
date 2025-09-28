@@ -89,7 +89,7 @@ export const loginUserHandler = async (
 
     const cookieOptions = {
       httpOnly: true,
-      secure: Env.NODE_ENV === "production",
+      secure: Env.NODE_ENV === "prod",
       sameSite: "lax" as "lax" | "strict" | "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
