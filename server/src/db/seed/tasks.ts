@@ -174,17 +174,20 @@ export const tasksSeed = [
 export async function seed_global_tasks() {
   console.log("🌱 Seeding global tasks...");
 
-  for (const task of tasksSeed) {
-    const existing = await db.select().from(tasks).where(eq(tasks.id, task.id));
+  await Promise.all(
+    tasksSeed.map(async (task) => {
+      const existing = await db
+        .select()
+        .from(tasks)
+        .where(eq(tasks.id, task.id));
 
-    if (existing.length === 0) {
-      await db.insert(tasks).values({
-        ...task,
-      });
-    } else {
-      console.log(`↔️ Skipped (already exists): ${task.id}`);
-    }
-  }
+      if (existing.length === 0) {
+        await db.insert(tasks).values({
+          ...task,
+        });
+      }
+    })
+  );
 
   console.log("🎉 Tasks Seeding complete!");
   // process.exit(0);

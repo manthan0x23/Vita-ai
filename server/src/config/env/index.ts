@@ -1,19 +1,23 @@
-import { z } from "zod/v4";
 import dotenv from "dotenv";
+import { z } from "zod";
 
-dotenv.config();
+// Load .env.test if in test mode
+const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
+dotenv.config({ path: envFile });
 
 const envSchema = z.object({
-    PORT: z.string().default("5000"),
-    DATABASE_URL: z.string().min(1),
-    NODE_ENV: z.enum(["prod", "dev"]).default("dev")
+  NODE_ENV: z.string(),
+  DATABASE_URL: z.string(),
+  PORT: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-    console.error("❌ Invalid environment variables:", parsedEnv.error.message);
-    process.exit(1);
+  console.error("❌ Invalid environment variables:", parsedEnv.error.message);
+  if (process.env.NODE_ENV !== "test") {
+    process.exit(1); // only exit in non-test env
+  }
 }
 
-export const Env = parsedEnv.data;
+export const Env = parsedEnv.data!;

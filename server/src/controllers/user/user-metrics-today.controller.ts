@@ -72,7 +72,7 @@ export const userMetricsTodayHandler = async (
         const target = (() => {
           switch (row.goalType) {
             case "hydration":
-              return superGoals.hydration * 1000;
+              return superGoals.hydration ;
             case "movement":
               return superGoals.movement;
             case "sleep":
@@ -87,9 +87,6 @@ export const userMetricsTodayHandler = async (
         })();
 
         let consumption = Number(row.consumption ?? 0);
-        if (row.goalType === "hydration") {
-          consumption *= 1000;
-        }
 
         const progress =
           target > 0

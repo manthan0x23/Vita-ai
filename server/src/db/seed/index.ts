@@ -1,6 +1,6 @@
 import { seed_global_tasks } from "./tasks";
 
-async function seed_main() {
+export async function seed_main() {
     await seed_global_tasks();
 }
 
