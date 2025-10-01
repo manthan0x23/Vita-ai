@@ -1,8 +1,11 @@
 import request from "supertest";
 import { Express } from "express";
 import app from "../src/app";
-import { migrate_db, close_db } from "../src/db/migrate";
-import { seed_main } from "../src/db/seed";
+import {
+  close_test_db,
+  migrate_test_db,
+} from "../src/db/tests-migrations/migrate-test-db";
+import { seed_test } from "../src/db/tests-migrations/seed-test-db";
 
 interface TaskBase {
   id: string;
@@ -40,12 +43,12 @@ const setupTestUser = async (prefix: string) => {
 };
 
 beforeAll(async () => {
-  await migrate_db();
-  await seed_main();
+  await migrate_test_db();
+  await seed_test();
 });
 
 afterAll(async () => {
-  await close_db();
+  await close_test_db();
 });
 
 describe("Mood Task Recommendation", () => {
